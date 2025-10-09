@@ -1,8 +1,11 @@
-from sqlmodel import create_engine, Session
 from core.config import settings
+from motor.motor_asyncio import AsyncIOMotorClient
 
-engine = create_engine(settings.DATABASE_URL, echo=True)
+DATABASE_URL = settings.DATABASE_URL 
+DATABASE_NAME = settings.DATABASE_NAME
 
-def get_session():
-    with Session(engine) as session:
-        yield session
+client = AsyncIOMotorClient(DATABASE_URL)
+db = client[DATABASE_NAME]
+
+def get_database():
+    return db
