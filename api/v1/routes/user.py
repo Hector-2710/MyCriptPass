@@ -2,23 +2,21 @@ from fastapi import APIRouter
 from schemas.user import UserCreate
 from models.user import User
 from services.user_services import create_user
-from fastapi import Depends, HTTPException, status
-from sqlmodel import Session
-from db.session import get_session
+from fastapi import HTTPException, status
 from exceptions.exceptions import UserAlreadyExistsError, NicknameAlreadyExistsError
 
 app = APIRouter(prefix="/user", tags=["user"])
 
 @app.post("/create", response_model=User,response_model_exclude={"hashed_password"}, status_code=status.HTTP_201_CREATED)
-def create_user_endpoint(user_data: UserCreate, session: Session = Depends(get_session)) -> User:
+async def create_user_endpoint(user_data: UserCreate) -> User:
     try:
-        user = create_user(session, user_data)  
+        user = await create_user(user_data)  
         return user
     
     except UserAlreadyExistsError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
+            detail= str(e)
         )
     except NicknameAlreadyExistsError as e:
         raise HTTPException(
