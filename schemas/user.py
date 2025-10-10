@@ -5,6 +5,8 @@ class UserBase(BaseModel):
     email: EmailStr =  Field(...,description="The email of the user")
     nickname: str = Field(..., description="The nickname of the user", min_length=3, max_length=13)
 
+    model_config = {"extra": "forbid"}  
+
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8, description="Password must be at least 8 characters")
     
