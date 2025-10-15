@@ -9,4 +9,11 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8, description="Password must be at least 8 characters")
-    
+
+class UserDelete(BaseModel):
+    email: EmailStr = Field(..., description="The email of the user to delete")
+
+class DeleteResponse(BaseModel):
+    success: bool = Field(..., description="Indicates if the deletion was successful")
+    detail: str = Field(..., description="Details about the deletion process")
+
