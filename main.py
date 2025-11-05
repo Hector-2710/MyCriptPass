@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.v1.routes import user
+from api.v1.routes import user,password
 from exceptions.handlers import register_exception_handlers
 from db.session import connect_to_mongo, close_mongo_connection
 from contextlib import asynccontextmanager
@@ -37,5 +37,6 @@ summary = "API para gestionar contraseñas de usuarios de forma segura"
 
 app = FastAPI(title="MyCryptPass API",summary=summary,lifespan=lifespan, description=description, version="0.0.1")
 app.include_router(user.router)
+app.include_router(password.router)
 register_exception_handlers(app)
 
