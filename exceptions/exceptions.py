@@ -29,3 +29,7 @@ class UnauthorizedError(AppBaseError):
 class IncorrectPasswordError(AppBaseError):
     def __init__(self, nickname: str):
         super().__init__(status_code=401, detail=f"Incorrect password for nickname {nickname}")
+
+class PasswordAlreadyExistsError(AppBaseError):
+    def __init__(self, nickname: str, service_name: str):
+        super().__init__(status_code=409, detail=f"Password for service {service_name} already exists for nickname {nickname}")
