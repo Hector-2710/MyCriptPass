@@ -10,7 +10,7 @@ async def create_password(nickname: str, password_data: PasswordCreate, db: Asyn
 
     hashed_password = get_password_hash(password_data.password)
 
-    update_result = await db["users"].update_one(
+    await db["users"].update_one(
         {"nickname": nickname},
         {"$push": {"passwords": {"app_service": password_data.service_name, "password": hashed_password}}}
     )
