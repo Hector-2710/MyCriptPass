@@ -35,3 +35,7 @@ class IncorrectPasswordError(AppBaseError):
 class PasswordAlreadyExistsError(AppBaseError):
     def __init__(self, nickname: str, service_name: str):
         super().__init__(status_code=409, detail=f"Password for service {service_name} already exists for nickname {nickname}")
+
+class PasswordNotFoundError(AppBaseError):
+    def __init__(self, nickname: str, service_name: str):
+        super().__init__(status_code=404, detail=f"Password for service {service_name} not found for nickname {nickname}")
