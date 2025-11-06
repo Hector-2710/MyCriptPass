@@ -2,9 +2,11 @@ from fastapi import HTTPException
 
 from pydantic import BaseModel
 
-class ErrorResponse(BaseModel):
-    detail: str
+class UserExists(BaseModel):
+    detail: str = "User already exists"
 
+class Unauthorized(BaseModel):
+    detail: str = "You are not authorized to delete user"
 
 class AppBaseError(HTTPException):
     def __init__(self, status_code: int, detail: str):
