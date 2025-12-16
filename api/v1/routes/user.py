@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Depends,status
-from schemas.user import UserCreate,DeleteResponse, UserDelete 
+from schemas.user import UserCreate,DeleteResponse
 from models.user import User
 from services.user_services import create_user,delete_user,login_service
 from db.session import get_database
