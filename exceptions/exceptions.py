@@ -8,6 +8,9 @@ class UserExists(BaseModel):
 class Unauthorized(BaseModel):
     detail: str = "You are not authorized to delete user"
 
+class PasswordNotFound(BaseModel):
+    detail: str = "Password not found"
+
 class AppBaseError(HTTPException):
     def __init__(self, status_code: int, detail: str):
         super().__init__(status_code=status_code, detail=detail)
