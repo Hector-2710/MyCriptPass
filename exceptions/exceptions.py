@@ -25,8 +25,8 @@ class UserNotFoundError(AppBaseError):
         super().__init__(status_code=404, detail=f"User with email {email} not found")
 
 class UnauthorizedError(AppBaseError):
-    def __init__(self, user: str):
-        super().__init__(status_code=401, detail=f"You are not authorized to delete user {user}")
+    def __init__(self, email: str):
+        super().__init__(status_code=401, detail=f"You are not authorized to delete email {email}")
 
 class IncorrectPasswordError(AppBaseError):
     def __init__(self, nickname: str):
