@@ -7,3 +7,6 @@ class PasswordCreate(BaseModel):
 class PasswordResponse(BaseModel):
     service_name: str
 
+class GetPasswordResponse(BaseModel):
+    service_name: str
+    password: str
