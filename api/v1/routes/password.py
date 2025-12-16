@@ -1,10 +1,12 @@
+from annotated_types import Ge
 from fastapi import APIRouter
 from schemas.password import PasswordCreate, PasswordResponse
 from services.password_services import create_password, get_password
 from db.session import get_database
 from fastapi import Depends,status
 from core.security import get_current_user
-from exceptions.exceptions import PasswordNotFoundError
+from exceptions.exceptions import PasswordNotFound
+from schemas.password import GetPasswordResponse
 
 
 router = APIRouter(prefix="/passwords", tags=["passwords"])
@@ -20,8 +22,8 @@ async def create_password_endpoint(password_data: PasswordCreate, User = Depends
     password = await create_password(User.nickname, password_data, db)
     return password
 
-@router.get("/{service_name}",summary="Obtener una contraseña",responses={404: {"model": PasswordNotFoundError, "description":"Contraseña no encontrada"}}, response_description="Contraseña obtenida exitosamente", status_code=status.HTTP_200_OK)
-async def get_password_endpoint(service_name: str, user = Depends(get_current_user), db=Depends(get_database)) :
+@router.get("/{service_name}",summary="Obtener una contraseña",responses={404: {"model": PasswordNotFound, "description":"Contraseña no encontrada"}},response_model=GetPasswordResponse,response_description="Contraseña obtenida exitosamente", status_code=status.HTTP_200_OK)
+async def get_password_endpoint(service_name: str, user = Depends(get_current_user), db=Depends(get_database)) -> GetPasswordResponse:
     """
     Obtiene una contraseña de la base de datos.
     - **nickname**: nickname del usuario
