@@ -1,5 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from schemas.password import PasswordCreate, PasswordResponse
+from schemas.password import GetPasswordResponse, PasswordCreate, PasswordResponse
 from exceptions.exceptions import PasswordAlreadyExistsError, PasswordNotFoundError
 
 async def create_password(nickname: str, password_data: PasswordCreate, db: AsyncIOMotorDatabase) -> PasswordResponse:
@@ -13,15 +13,17 @@ async def create_password(nickname: str, password_data: PasswordCreate, db: Asyn
     )
     return PasswordResponse(service_name=password_data.service_name)
 
-async def get_password(nickname: str, service_name: str, db: AsyncIOMotorDatabase) -> str:
+async def get_password(nickname: str, service_name: str, db: AsyncIOMotorDatabase) -> GetPasswordResponse:
     exists = await exists_password_for_service(nickname, service_name, db)
     if not exists:
         raise PasswordNotFoundError(nickname=nickname, service_name=service_name)
     password = await db["users"].find_one(
         {"nickname": nickname, "passwords.app_service": service_name},
-        {"passwords.$": 1, "_id": 0},
+        {"passwords": 1, "_id": 0},
     )
-    return password
+    print(password)
+    return GetPasswordResponse(service_name=service_name,password=password["passwords"][0]["password"])
+    
     
 async def exists_password_for_service(nickname: str, service_name: str, db: AsyncIOMotorDatabase) -> bool:
     exists = await db["users"].find_one(
