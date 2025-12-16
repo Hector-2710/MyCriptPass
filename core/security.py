@@ -13,14 +13,11 @@ from db.session import get_database
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
-
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
-
 
 def create_access_token(data: Dict[str, Any], expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
@@ -29,7 +26,6 @@ def create_access_token(data: Dict[str, Any], expires_delta: timedelta | None = 
     to_encode.update({"exp": int(expire.timestamp()), "iat": int(now.timestamp())})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
-
 
 def decode_token(token: str) -> TokenData:
     try:

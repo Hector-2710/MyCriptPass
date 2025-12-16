@@ -2,9 +2,11 @@ from fastapi import HTTPException
 
 from pydantic import BaseModel
 
-class ErrorResponse(BaseModel):
-    detail: str
+class UserExists(BaseModel):
+    detail: str = "User already exists"
 
+class Unauthorized(BaseModel):
+    detail: str = "You are not authorized to delete user"
 
 class AppBaseError(HTTPException):
     def __init__(self, status_code: int, detail: str):
@@ -23,9 +25,17 @@ class UserNotFoundError(AppBaseError):
         super().__init__(status_code=404, detail=f"User with email {email} not found")
 
 class UnauthorizedError(AppBaseError):
-    def __init__(self, user: str):
-        super().__init__(status_code=401, detail=f"You are not authorized to delete user {user}")
+    def __init__(self, email: str):
+        super().__init__(status_code=401, detail=f"You are not authorized to delete email {email}")
 
 class IncorrectPasswordError(AppBaseError):
     def __init__(self, nickname: str):
         super().__init__(status_code=401, detail=f"Incorrect password for nickname {nickname}")
+
+class PasswordAlreadyExistsError(AppBaseError):
+    def __init__(self, nickname: str, service_name: str):
+        super().__init__(status_code=409, detail=f"Password for service {service_name} already exists for nickname {nickname}")
+
+class PasswordNotFoundError(AppBaseError):
+    def __init__(self, nickname: str, service_name: str):
+        super().__init__(status_code=404, detail=f"Password for service {service_name} not found for nickname {nickname}")

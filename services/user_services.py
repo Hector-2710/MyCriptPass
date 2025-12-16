@@ -1,11 +1,10 @@
 from models.user import User
 from motor.motor_asyncio import AsyncIOMotorDatabase 
 from schemas.user import UserCreate, UserDelete, DeleteResponse
-from core.security import get_password_hash
+from core.security import get_password_hash, verify_password, create_access_token
 from typing import Optional
 from schemas.token import Token
 from fastapi.security import OAuth2PasswordRequestForm
-from core.security import verify_password, create_access_token
 from exceptions.exceptions import UserAlreadyExistsError, NicknameAlreadyExistsError, UserNotFoundError,UnauthorizedError,IncorrectPasswordError
 
 async def create_user(user_data: UserCreate, db: AsyncIOMotorDatabase) -> User:
@@ -35,16 +34,16 @@ async def login_service(form_data: OAuth2PasswordRequestForm, db: AsyncIOMotorDa
     access_token = create_access_token({"sub": user.email})
     return Token(access_token=access_token, token_type="bearer")
 
-async def delete_user(user: UserDelete, db: AsyncIOMotorDatabase, current_user: User) -> DeleteResponse:
-    existing_user = await get_user_by_email(user.email, db)
+async def delete_user(email: str, db: AsyncIOMotorDatabase, current_user: User) -> DeleteResponse:
+    existing_user = await get_user_by_email(email, db)
     if not existing_user:
-        raise UserNotFoundError(email=user.email)
+        raise UserNotFoundError(email=email)
 
-    if current_user.email != user.email and not getattr(current_user, "is_admin", False):
-        raise UnauthorizedError(user=current_user.email)
+    if current_user.email != email and not getattr(current_user, "is_admin", False):
+        raise UnauthorizedError(email=email)
 
-    await db["users"].delete_one({"email": user.email})
-    return DeleteResponse(success = True, detail=f"User {user.email} deleted successfully")
+    await db["users"].delete_one({"email": email})
+    return DeleteResponse(success = True, detail=f"User {email} deleted successfully")
         
 async def get_user_by_email(email: str, db: AsyncIOMotorDatabase) -> Optional[User]:
     user_data = await db["users"].find_one({"email": email})
