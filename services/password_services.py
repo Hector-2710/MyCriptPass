@@ -1,0 +1,54 @@
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from schemas.password import GetPasswordResponse, PasswordCreate, PasswordResponse
+from exceptions.exceptions import PasswordAlreadyExistsError, PasswordNotFoundError
+
+async def create_password(nickname: str, password_data: PasswordCreate, db: AsyncIOMotorDatabase) -> PasswordResponse:
+    existing = await exists_password_for_service(nickname, password_data.service_name, db)
+    if existing:
+        raise PasswordAlreadyExistsError(nickname=nickname, service_name=password_data.service_name)
+
+    await db["users"].update_one(
+        {"nickname": nickname},
+        {"$push": {"passwords": {"app_service": password_data.service_name, "password": password_data.password}}}
+    )
+    return PasswordResponse(service_name=password_data.service_name)
+
+async def get_password(nickname: str, service_name: str, db: AsyncIOMotorDatabase) -> GetPasswordResponse:
+    exists = await exists_password_for_service(nickname, service_name, db)
+    if not exists:
+        raise PasswordNotFoundError(nickname=nickname, service_name=service_name)
+    password = await db["users"].find_one(
+        {"nickname": nickname, "passwords.app_service": service_name},
+        {"passwords": 1, "_id": 0},
+    )
+    print(password)
+    return GetPasswordResponse(service_name=service_name,password=password["passwords"][0]["password"])
+
+async def delete_password(nickname: str, service_name: str, db: AsyncIOMotorDatabase) -> PasswordResponse:
+    exist = await exists_password_for_service(nickname, service_name, db)
+    if not exist:
+        raise PasswordNotFoundError(nickname=nickname, service_name=service_name)
+    await db["users"].update_one(
+        {"nickname": nickname},
+        {"$pull": {"passwords": {"app_service": service_name}}}
+    )
+    return PasswordResponse(service_name=service_name)
+
+async def change_password(nickname: str, service_name: str, new_password: str, db: AsyncIOMotorDatabase) -> PasswordResponse:
+    exist = await exists_password_for_service(nickname, service_name, db)
+    if not exist:
+        raise PasswordNotFoundError(nickname=nickname, service_name=service_name)
+    await db["users"].update_one(
+        {"nickname": nickname, "passwords.app_service": service_name},
+        {"$set": {"passwords.$.password": new_password}}
+    )
+    return PasswordResponse(service_name=service_name)
+    
+async def exists_password_for_service(nickname: str, service_name: str, db: AsyncIOMotorDatabase) -> bool:
+    exists = await db["users"].find_one(
+        {"nickname": nickname, "passwords.app_service": service_name},
+        {"_id": 1},
+    )
+    if exists:
+        return True
+    return False
