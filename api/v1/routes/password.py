@@ -1,7 +1,6 @@
-from annotated_types import Ge
 from fastapi import APIRouter
 from schemas.password import PasswordCreate, PasswordResponse
-from services.password_services import create_password, get_password, delete_password
+from services.password_services import create_password, get_password, delete_password, change_password
 from db.session import get_database
 from fastapi import Depends,status
 from core.security import get_current_user
@@ -40,4 +39,15 @@ async def delete_password_endpoint(service_name: str, user = Depends(get_current
     - **service_name**: nombre del servicio
     """
     password = await delete_password(user.nickname, service_name, db)
+    return password
+
+@router.put("/{service_name}",summary="Cambiar una contraseña",responses={404: {"model": PasswordNotFound, "description":"Contraseña no encontrada"}},response_model=PasswordResponse,response_description="Contraseña cambiada exitosamente", status_code=status.HTTP_200_OK)
+async def change_password_endpoint(service_name: str, new_password: str, user = Depends(get_current_user), db=Depends(get_database)) -> PasswordResponse:
+    """
+    Cambia una contraseña en la base de datos.
+    - **nickname**: nickname del usuario
+    - **service_name**: nombre del servicio
+    - **new_password**: nueva contraseña
+    """
+    password = await change_password(user.nickname, service_name, new_password, db)
     return password
