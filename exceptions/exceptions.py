@@ -5,11 +5,23 @@ from pydantic import BaseModel
 class UserExists(BaseModel):
     detail: str = "User already exists"
 
+class NicknameExists(BaseModel):
+    detail: str = "Nickname already exists"
+
 class Unauthorized(BaseModel):
     detail: str = "You are not authorized to delete user"
 
 class PasswordNotFound(BaseModel):
     detail: str = "Password not found"
+
+class PasswordAlreadyExists(BaseModel):
+    detail: str = "Password already exists"
+
+class UserNotFound(BaseModel):
+    detail: str = "User not found"
+
+class IncorrectPassword(BaseModel):
+    detail: str = "Incorrect password"
 
 class AppBaseError(HTTPException):
     def __init__(self, status_code: int, detail: str):
