@@ -23,6 +23,16 @@ async def get_password(nickname: str, service_name: str, db: AsyncIOMotorDatabas
     )
     print(password)
     return GetPasswordResponse(service_name=service_name,password=password["passwords"][0]["password"])
+
+async def delete_password(nickname: str, service_name: str, db: AsyncIOMotorDatabase) -> PasswordResponse:
+    exist = await exists_password_for_service(nickname, service_name, db)
+    if not exist:
+        raise PasswordNotFoundError(nickname=nickname, service_name=service_name)
+    await db["users"].update_one(
+        {"nickname": nickname},
+        {"$pull": {"passwords": {"app_service": service_name}}}
+    )
+    return PasswordResponse(service_name=service_name)
     
     
 async def exists_password_for_service(nickname: str, service_name: str, db: AsyncIOMotorDatabase) -> bool:
