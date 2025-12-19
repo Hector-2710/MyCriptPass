@@ -6,11 +6,11 @@ from db.session import get_database
 from schemas.token import Token
 from fastapi.security import OAuth2PasswordRequestForm
 from core.security import get_current_user
-from exceptions.exceptions import IncorrectPassword, UserExists,Unauthorized,NicknameExists,UserNotFound
+from exceptions.exceptions import IncorrectPassword, EmailExists,Unauthorized,NicknameExists,UserNotFound
 
 router = APIRouter(prefix="/users",tags=["users"])
 
-@router.post("/", summary="Crear un nuevo usuario",response_model=User,responses={409: {"model": UserExists, "description":"Conflicto: el usuario ya existe"}, 499: {"model": NicknameExists, "description":"Conflicto: el nickname ya existe"}}, response_model_exclude={"hashed_password"}, response_description="Usuario creado exitosamente", status_code=status.HTTP_201_CREATED)
+@router.post("/", summary="Crear un nuevo usuario",response_model=User,responses={409: {"model": EmailExists, "description":"Conflicto: el email ya existe"}, 499: {"model": NicknameExists, "description":"Conflicto: el nickname ya existe"}}, response_model_exclude={"hashed_password"}, response_description="Usuario creado exitosamente", status_code=status.HTTP_201_CREATED)
 async def create_user_endpoint(user_data: UserCreate, db=Depends(get_database)) -> User:
     """
     Crea un nuevo usuario en la base de datos
