@@ -2,7 +2,7 @@ from fastapi import HTTPException
 
 from pydantic import BaseModel
 
-class UserExists(BaseModel):
+class EmailExists(BaseModel):
     detail: str = "User already exists"
 
 class NicknameExists(BaseModel):
