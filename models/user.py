@@ -6,3 +6,5 @@ class User(BaseModel):
     nickname: str 
     hashed_password: str
 
+  
+

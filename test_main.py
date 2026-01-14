@@ -46,11 +46,10 @@ async def test_create_user_fail_nickname(ac):
     }
 
     user2 = {
-            "nickname": "usernumero1", 
-            "email": "usernumero3@example.com", 
-            "password": "securepassword2", 
-            "full_name": "Test User numero 2"
-
+        "nickname": "usernumero1", 
+        "email": "usernumero3@example.com", 
+        "password": "securepassword2", 
+        "full_name": "Test User numero 2"
         }
     
     response = await ac.post("/users/", json=user)
